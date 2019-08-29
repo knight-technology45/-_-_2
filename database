@@ -1,0 +1,510 @@
+#include <iostream>
+#include <ctime>
+#include <vector>
+#include <iterator>
+#include <fstream>
+#include <algorithm> 
+#include <string>
+#include <locale>
+#include "windows.h"
+using namespace std;
+
+
+//*******************************************************************************************************************************************************************************************
+
+struct time_date //структура для хранения даты 
+{
+	int year;
+	int mounts;
+	int day;
+};
+struct fio //структура для хранения фио
+{
+	string surname; //фамилия 
+	string name; //имя
+	string pat; //отчество
+};
+struct car // структура для хранения информации о машине 
+{
+	bool machine; //Наличие машины. Если есть 1 если нет 0
+	string car_number; // Номер машины
+	string make_car; //Марка машины
+	string color_car; // Цвет машины
+};
+
+//*******************************************************************************************************************************************************************************************
+
+struct base // структура  для хрнения об одном работнике
+{
+	int number; //номер рабочего 
+	fio worker_fio; //фио
+	time_date year_of_birth; // Дата рожденеия.
+	float salary; //зп
+	int children; //Кол.во детей
+	bool floor; //пол. если мальчик 1 если девочка 0
+	int alcohol; //Отношение к алкоголю. Если сильное 1 если среднее 2 если некакое 3
+	string position; //Должность
+	time_date vacation; //Дата начала отпуска 
+	int stringacter; //Характер
+	bool spouse; //Наличие супруга(и). Если есть 1 если нет 0
+	fio suprug_fio; //фио супрага(и)
+	car car_person; //машина
+};
+vector<base>made_base; //Глобальнальная переменная для хранения данных о всех рабочих
+int number_worker; //Номер текукщего рабочего
+//*******************************************************************************************************************************************************************************************
+
+template <typename My_TIP>
+My_TIP getValue(My_TIP A, string B)
+{// Защита от дурака
+	while (true) // цикл продолжается до тех пор, пока пользователь не введёт корректное значение
+	{
+		cout << B << endl;
+		std::cin >> A;
+		unsigned int SIZE_byte = (pow(2, sizeof(A) * 8.0) - 1);
+		int B = sizeof(A);
+		// Проверка на предыдущее извлечение
+		if (std::cin.fail()) // если предыдущее извлечение оказалось неудачным,
+		{
+			std::cin.clear(); // то возвращаем cin в 'обычный' режим работы
+			std::cin.ignore(SIZE_byte, '\n'); // и удаляем значения предыдущего ввода из входного буфера
+			std::cout << "Oops, that input is invalid.  Please try again.\n";
+		}
+		else
+		{
+			std::cin.ignore(32767, '\n'); // удаляем лишние значения
+
+			return A;
+		}
+	}
+}
+
+//*******************************************************************************************************************************************************************************************
+
+void entering_information(base &object)
+{//Ввод информаации 
+	setlocale(LC_ALL, "Russian");
+	cout << endl;  object.number = getValue(object.number, "Введите номер рабочего");
+	cout << endl;  cout << "Введите фамилию рабочего" << endl; 	cin >> object.worker_fio.surname;
+	cout << endl;  cout << "Введите имя рабочего" << endl;			cin >> object.worker_fio.name;
+	cout << endl;  cout << "Введите отчество рабочего" << endl;	cin >> object.worker_fio.pat;
+	system("cls");
+	cout << endl;  object.floor = getValue(object.floor, "Введите пол если мальчик 1 если девочка 0");
+	system("cls");
+	cout << endl;  object.year_of_birth.year = getValue(object.year_of_birth.year, "Введите год рожденеия");
+	cout << endl; object.year_of_birth.mounts = getValue(object.year_of_birth.mounts, "Введите месяц рожденеия");
+	cout << endl;  object.year_of_birth.day = getValue(object.year_of_birth.day, "Введите день рожденеия");
+	system("cls");
+	cout << endl; object.salary = getValue(object.salary, "Введите Зп");
+	system("cls");
+	cout << endl; object.children = getValue(object.children, "Введите кол.во детей");
+	system("cls");
+	cout << endl; object.alcohol = getValue (object.alcohol, "Введите Отношение к алкоголю. Если сильное 1 если среднее 2 если отрицательное 3");
+	system("cls");
+	cout << "Введите должность" << endl;			cin >> object.position ;
+	system("cls");
+	cout << endl; object.vacation.year = getValue(object.vacation.year, "Введите год начала отпуска");
+	cout << endl; object.vacation.mounts = getValue(object.vacation.mounts, "Введите месяц начала отпуска");
+	cout << endl; object.vacation.day = getValue(object.vacation.day, "Введите день начала отпуска");
+	system("cls");
+	cout << endl; object.stringacter = getValue(object.stringacter, "Введите характер. Если флегматик 1 если меланхолик 2 если сангвиник 3 если холерик 4");
+	cout << endl; object.spouse = getValue(object.spouse, "Введите наличие супруга(и)");
+	if (object.spouse)
+	{
+		cout << endl; cout << "Введите фамилию супруга(и)" << endl;	cin >> object.suprug_fio.surname;
+		cout << endl; cout << "Введите имя супруга(и)" << endl;		cin >> object.suprug_fio.name;
+		cout << endl; cout << "Введите отчество супруга(и)" << endl;	cin >> object.suprug_fio.pat;
+	}
+	else
+	{
+		cout << endl; object.suprug_fio.surname = "0000";
+		cout << endl; object.suprug_fio.name = "0000";
+		cout << endl; object.suprug_fio.pat = "0000";
+	}
+	system("cls"); 
+	cout << endl; object.car_person.machine = getValue(object.car_person.machine, "Введите наличие машины");
+	if (object.car_person.machine)
+	{
+		cout << endl; cout << " номер машины " << endl;	cin >> object.car_person.car_number;
+		cout << endl; cout << " марка машины " << endl;	cin >> object.car_person.make_car;
+		cout << endl; cout << " цвет машины " << endl;	cin >> object.car_person.color_car;
+	}
+	else
+	{
+		cout << endl; object.car_person.car_number = "000";
+		cout << endl; object.car_person.make_car = "000";
+		cout << endl; object.car_person.color_car = "000";
+	}
+	system("cls");
+	made_base.push_back(object);
+}
+
+void interpreter(bool flag, string A, string B)
+{//функция для коррекного ввода инфорации
+	if (flag==1)
+		cout << A << endl;
+	else
+		cout << B << endl;
+}
+
+//*******************************************************************************************************************************************************************************************
+
+template <typename My_TIP>
+void inp_funct(ifstream &fint,  My_TIP &B)
+{
+	fint >> B ;
+}
+void input_put_information(base &object)
+{   
+	//функция для чтения данных из файла и заполнения базы данных на одного человека
+	ifstream finp("F:\\database.txt");
+	inp_funct(finp,  object.number);
+	inp_funct(finp,  object.worker_fio.surname);
+	inp_funct(finp,  object.worker_fio.name);
+	inp_funct(finp,  object.worker_fio.pat);
+	inp_funct(finp,  object.floor);
+	inp_funct(finp,  object.year_of_birth.year);
+	inp_funct(finp,  object.year_of_birth.mounts);
+	inp_funct(finp,  object.year_of_birth.day);
+	inp_funct(finp,  object.salary);
+	inp_funct(finp,  object.children);
+	inp_funct(finp,  object.alcohol);
+	inp_funct(finp,  object.position);
+	inp_funct(finp,  object.vacation.year);
+	inp_funct(finp,  object.vacation.mounts);
+	inp_funct(finp,  object.vacation.day);
+	inp_funct(finp,  object.stringacter);
+	inp_funct(finp,  object.spouse);
+	inp_funct(finp,  object.suprug_fio.surname);
+	inp_funct(finp,  object.suprug_fio.name);
+	inp_funct(finp,  object.suprug_fio.pat);
+	inp_funct(finp,  object.car_person.machine);
+	inp_funct(finp,  object.car_person.car_number);
+	inp_funct(finp,  object.car_person.make_car);
+	inp_funct(finp,  object.car_person.color_car);
+	finp.close();
+	cout << "Запись в файл завершена"<<endl ;//?
+}
+//*******************************************************************************************************************************************************************************************
+
+template <typename My_TIP>
+void Write_f(ofstream &fout, My_TIP B)
+{
+	fout << B << " ";
+}
+void WRITE_FILE(base &object)
+{	
+	//для записи файла
+	//Write_file//(My_TIP B)
+	ofstream fout("F:\\database.txt", ios_base::app);
+	Write_f(fout,	object.number);
+	Write_f(fout,	object.worker_fio.surname);
+	Write_f(fout,	object.worker_fio.name);
+	Write_f(fout,	object.worker_fio.pat);
+	Write_f(fout,	object.floor);
+	Write_f(fout,	object.year_of_birth.year);
+	Write_f(fout,	object.year_of_birth.mounts);
+	Write_f(fout,	object.year_of_birth.day);
+	Write_f(fout,	object.salary);
+	Write_f(fout,	object.children);
+	Write_f(fout,	object.alcohol);
+	Write_f(fout,	object.position);
+	Write_f(fout,	object.vacation.year);
+	Write_f(fout,	object.vacation.mounts);
+	Write_f(fout,	object.vacation.day);
+	Write_f(fout,	object.stringacter);
+	Write_f(fout,	object.spouse);
+	Write_f(fout,	object.suprug_fio.surname);
+	Write_f(fout,	object.suprug_fio.name);
+	Write_f(fout,	object.suprug_fio.pat);
+	Write_f(fout,	object.car_person.machine);
+	Write_f(fout,	object.car_person.car_number);
+	Write_f(fout,	object.car_person.make_car);
+	Write_f(fout,	object.car_person.color_car);
+	fout << endl;
+	fout.close();
+	cout << endl;
+}
+//*******************************************************************************************************************************************************************************************
+
+template <typename My_TIP>
+void out_funct(string A, My_TIP B)
+{ // Шаблон функции для отображения структуры в консоли
+	cout << A << B << " | " << endl;
+}
+void out_funct(string A, bool B)
+{ // Перегруженная функция для отображения структуры в консоли с типом bool
+	if (A == " пол ")
+	{
+		cout << A;
+		interpreter(B, "Man", "Woman");
+	}
+	else
+	{
+		cout << A << B << " | " << endl;
+	}
+}
+void out_put_information(base &object)
+{
+	//ofstream fout("F:\\database.txt", ios_base::out);
+	out_funct( "| номер рабочего ",					object.number );
+	out_funct( " фамилия рабочего ",					object.worker_fio.surname);
+	out_funct( " имя рабочего ",						object.worker_fio.name);
+	out_funct( " отчество рабочего ",					object.worker_fio.pat);
+	out_funct( " пол ",								object.floor);
+	out_funct( " год рождения ",						object.year_of_birth.year);
+	out_funct( " месяц рождения ",						object.year_of_birth.mounts);
+	out_funct( " день рождения ",						object.year_of_birth.day);
+	out_funct( " зп ",									object.salary);
+	out_funct( " кол.во ",								object.children);
+	out_funct( " отношение к алкоголю ",				object.alcohol);
+	out_funct( " должность ",							object.position);
+	out_funct( " год начала отпуска ",					object.vacation.year);
+	out_funct( " месяц начала отпуска",				object.vacation.mounts);
+	out_funct( " день начала отпуска ",				object.vacation.day);
+	out_funct( " характер ",							object.stringacter);
+	out_funct( " наличие супруга(и) ",					object.spouse);
+	out_funct( " фамилия супруга(и) ",					object.suprug_fio.surname);
+	out_funct( " имя супруга(и) ",						object.suprug_fio.name);
+	out_funct( " отчество супруга(и) ",				object.suprug_fio.pat);
+	out_funct( " налчие машины если 1 то есть если 0 то нет ", object.car_person.machine);
+	out_funct( " номер машины ",						object.car_person.car_number);
+	out_funct( " марка машины ",						object.car_person.make_car);
+	out_funct( " цвет машины ",						object.car_person.color_car);
+	cout << endl;
+}
+
+//*******************************************************************************************************************************************************************************************
+
+void  t_t_b(string A, int &B)
+{
+
+	B = stoi(A);
+}
+void  t_t_b(string A, bool &B)
+{
+	B = stoi(A);
+}
+void  t_t_b(string A, float &B)
+{
+	B = stoi(A);
+}
+void  t_t_b(string A, string &B)
+{
+	B = A;
+}
+void transfer_to_base(base &object, vector<string>read_one_str)//функция на заполнение стуктуры(base)
+{
+	//object.number = stoi(read_one_str.at(0));
+	int k = 0;
+	t_t_b(read_one_str.at(k), object.number);
+	t_t_b(read_one_str.at(++k), object.worker_fio.surname);
+	t_t_b(read_one_str.at(++k), object.worker_fio.name);
+	t_t_b(read_one_str.at(++k), object.worker_fio.pat);
+	t_t_b(read_one_str.at(++k), object.floor);
+	t_t_b(read_one_str.at(++k), object.year_of_birth.year);
+	t_t_b(read_one_str.at(++k), object.year_of_birth.mounts);
+	t_t_b(read_one_str.at(++k), object.year_of_birth.day);
+	t_t_b(read_one_str.at(++k), object.salary);
+	t_t_b(read_one_str.at(++k), object.children);
+	t_t_b(read_one_str.at(++k), object.alcohol);
+	t_t_b(read_one_str.at(++k), object.position);
+	t_t_b(read_one_str.at(++k), object.vacation.year);
+	t_t_b(read_one_str.at(++k), object.vacation.mounts);
+	t_t_b(read_one_str.at(++k), object.vacation.day);
+	t_t_b(read_one_str.at(++k), object.stringacter);
+	t_t_b(read_one_str.at(++k), object.spouse);
+	t_t_b(read_one_str.at(++k), object.suprug_fio.name);
+	t_t_b(read_one_str.at(++k), object.suprug_fio.surname);
+	t_t_b(read_one_str.at(++k), object.suprug_fio.pat);
+	t_t_b(read_one_str.at(++k), object.car_person.car_number);
+	t_t_b(read_one_str.at(++k), object.car_person.color_car);
+	t_t_b(read_one_str.at(++k), object.car_person.machine);
+	t_t_b(read_one_str.at(++k), object.car_person.make_car);
+	//t_t_b(read_one_str.at(), object.stringacter);
+	//object. = stoi(read_one_str.at(7));
+}
+
+//*******************************************************************************************************************************************************************************************
+
+void READ_FILE(vector <string> &read_one_str,base &object)
+{
+	ifstream fin("F:\\database.txt", ios_base::in);
+	if (!fin.is_open())
+	{
+		cout << "Файл не может быть открыт или создан\n";
+		system("pause");
+		exit(1);
+	}
+	while (fin)
+	{
+		char buff[300];
+		char buff_2[300];
+		fin >> buff;
+		read_one_str.push_back(buff);
+		//int sdf = 0;
+	}
+	transfer_to_base(object, read_one_str);//вызов функции
+	fin.close();
+}
+
+//*******************************************************************************************************************************************************************************************
+
+bool Message_Prodoljit_YES_NO() 
+{//Функция спрашивает про продолжение работы
+	int msgboxID = MessageBox(
+		NULL,
+		" Хотите продолжить заполнять базу данных?!",
+		"Продолжить?",
+		MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2
+	);
+
+	switch (msgboxID)
+	{
+	case IDNO:
+		return 0;
+		break;
+	case IDYES:
+		return 1;
+		break;
+	}
+}
+
+//*******************************************************************************************************************************************************************************************
+
+bool foolproof()
+{//Функция спрашивает про продолжение работы
+	int msgboxID = MessageBox(
+		NULL,
+		" Вы не правильно ввели цифру!!! хотите продолжить? ",
+		"ошибка?",
+		MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2
+	);
+
+	switch (msgboxID)
+	{
+	case IDNO:
+		return 0;
+		break;
+	case IDYES:
+		return 1;
+		break;
+	}
+}
+
+//*******************************************************************************************************************************************************************************************
+
+bool clearfiles()
+{//Функция спрашивает про продолжение работы
+	int msgboxID = MessageBox(
+		NULL,
+		"Призаписи новых данных мы можем повредить страые!!! Вы хотите очистить файл со старыми базами данных ???",
+		"???",
+		MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2
+	);
+
+	switch (msgboxID)
+	{
+	case IDNO:
+		return 0;
+		break;
+	case IDYES:
+		return 1;
+		break;
+	}
+}
+
+//*******************************************************************************************************************************************************************************************
+
+
+void table(base &object)
+{
+	cout << "| № |         ФИО      |Пол|      Г.Р.     |    ЗП     |Кол.во детей|Отношение к алкоголю|  Должность  |Дата начала отпуска|Характер|Наличие супруга|   ФИО супруга    |Наличие машины|Номер машины|Марка машины|Цвет машины|" << endl;
+	cout << "| " << object.number << " | ";
+	cout << "  " << object.worker_fio.name << " | ";
+	cout << object.floor << " | ";
+	cout << " " << object.year_of_birth.year << " | " << object.year_of_birth.mounts << " | " << object.year_of_birth.day << " |    " << object.salary << "      |      "
+	<< object.children << "     | " ;
+	/*cout << "     " << object.worker_fio.surname << " | " << endl;
+	cout << "     " << object.worker_fio.pat << "|" << endl;*/
+}
+
+//*******************************************************************************************************************************************************************************************
+
+void desin(base &object, vector<string>read_one_str)
+{
+	//меню
+	int m = 0;
+		bool start = 0;
+	do
+	{
+		system("cls");
+		cout << " Введите цифру \n если 0 то выход из программы \n если 1 то заполнение базы \n если 2 то считать с файла ||F:\\database.txt|| \n если 3 найти информацию" << endl;
+
+		cin >> m;
+		switch (m)
+		{
+		case 0:
+			exit(0);
+			break;
+		case 1:
+			do
+			{
+				if (clearfiles())
+				{
+					ofstream fout("F:\\database.txt", ios_base::trunc);
+					fout.close();
+				}
+				READ_FILE(read_one_str, object);
+				table(object);
+				entering_information(object);
+				out_put_information(object);
+				WRITE_FILE(object);
+			} while (Message_Prodoljit_YES_NO());
+
+			//input_put_information(object);
+			break;
+		case 2:
+			READ_FILE(read_one_str, object);
+			out_put_information(object);
+			break;
+		case 3:
+			cout << "пока не работает " << endl;
+			break;
+		default:
+			{
+				start = foolproof();
+				break;
+			}
+		}
+		
+	} while (start);
+}
+
+//*******************************************************************************************************************************************************************************************
+
+int main()
+{
+	setlocale(LC_ALL, "Russian");
+	BOOL WINAPI SetConsoleOutputCP(__in UINT wCodePageID); 
+	BOOL WINAPI SetConsoleCP(__in UINT wCodePageID);
+	COORD coord;
+	SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+
+	
+	base one_base;
+	char buff[300];
+	vector<string>read_one_str;
+
+	desin(one_base, read_one_str);
+
+	for (int i = 0; i < read_one_str.size(); i++)
+	{
+		strncpy(buff, read_one_str[i].c_str(), 100);
+		cout << " " << buff;
+	}
+	
+	system("pause");
+}
